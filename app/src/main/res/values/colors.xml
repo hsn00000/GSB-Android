@@ -2,4 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gsb_primary">#006D77</color>
+    <color name="gsb_primary_dark">#004B53</color>
+    <color name="gsb_accent">#83C5BE</color>
+    <color name="gsb_background">#F4F8F7</color>
+    <color name="gsb_text_primary">#17353A</color>
+    <color name="gsb_text_secondary">#60757A</color>
 </resources>

@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">GSB-Visite</string>
+    <string name="gsb_name">GSB</string>
+    <string name="gsb_logo_description">Logo GSB</string>
+    <string name="login_title">Connexion</string>
+    <string name="login_subtitle">Espace visiteurs médicaux</string>
+    <string name="login_email_hint">Adresse mail</string>
+    <string name="login_password_hint">Mot de passe</string>
+    <string name="login_button">Se connecter</string>
+    <string name="login_invalid_email">Adresse mail invalide</string>
+    <string name="login_invalid_password">Le mot de passe doit contenir au moins 6 caractères</string>
+    <string name="login_success">Connecté : %1$s</string>
 </resources>
