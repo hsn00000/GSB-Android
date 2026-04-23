@@ -7,12 +7,25 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.gsb_visite.R;
+import com.example.gsb_visite.data.model.LoginResponse;
+import com.example.gsb_visite.data.repository.LoginRepository;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class LoginViewModel extends ViewModel {
     private static final int PASSWORD_MIN_LENGTH = 6;
 
+    private final LoginRepository loginRepository;
     private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private final MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
+
+    @Inject
+    public LoginViewModel(LoginRepository loginRepository) {
+        this.loginRepository = loginRepository;
+    }
 
     public LiveData<LoginFormState> getLoginFormState() {
         return loginFormState;
@@ -28,7 +41,17 @@ public class LoginViewModel extends ViewModel {
             return;
         }
 
-        loginResult.setValue(new LoginResult(email));
+        loginRepository.login(email, password, new LoginRepository.RepositoryCallback<LoginResponse>() {
+            @Override
+            public void onSuccess(LoginResponse result) {
+                loginResult.setValue(new LoginResult(result.getUsername(), false));
+            }
+
+            @Override
+            public void onError(String message) {
+                loginResult.setValue(new LoginResult(message, true));
+            }
+        });
     }
 
     public void loginDataChanged(String email, String password) {

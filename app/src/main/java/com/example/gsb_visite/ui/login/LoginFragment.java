@@ -11,12 +11,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.gsb_visite.R;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class LoginFragment extends Fragment {
     private LoginViewModel loginViewModel;
     private TextInputLayout emailLayout;
@@ -45,6 +50,11 @@ public class LoginFragment extends Fragment {
         emailEditText = view.findViewById(R.id.email_edit_text);
         passwordEditText = view.findViewById(R.id.password_edit_text);
         loginButton = view.findViewById(R.id.login_button);
+        MaterialButton signupButton = view.findViewById(R.id.signup_button);
+
+        signupButton.setOnClickListener(v -> 
+            Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_signupFragment)
+        );
 
         loginButton.setEnabled(false);
 
@@ -67,14 +77,26 @@ public class LoginFragment extends Fragment {
                 return;
             }
 
-            if (loginResult.getError() != null) {
-                Toast.makeText(requireContext(), loginResult.getError(), Toast.LENGTH_SHORT).show();
+            if (loginResult.getError() != null || loginResult.getErrorMessage() != null) {
+                String errorMsg = loginResult.getErrorMessage() != null 
+                    ? loginResult.getErrorMessage() 
+                    : getString(loginResult.getError());
+                
+                // Affichage d'une Snackbar rouge pour l'erreur
+                Snackbar.make(view, errorMsg, Snackbar.LENGTH_LONG)
+                        .setBackgroundTint(getResources().getColor(android.R.color.holo_red_dark))
+                        .setTextColor(getResources().getColor(android.R.color.white))
+                        .show();
             } else {
-                Toast.makeText(
-                        requireContext(),
-                        getString(R.string.login_success, loginResult.getDisplayName()),
-                        Toast.LENGTH_SHORT
-                ).show();
+                // Succès
+                String welcomeName = loginResult.getDisplayName() != null 
+                    ? loginResult.getDisplayName() 
+                    : "Visiteur";
+                
+                Toast.makeText(requireContext(), "Bienvenue " + welcomeName, Toast.LENGTH_SHORT).show();
+
+                // Redirection
+                Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_homeFragment);
             }
         });
 

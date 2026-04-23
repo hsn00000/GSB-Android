@@ -7,5 +7,24 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.gsb_visite.ui.login.LoginFragment"
-        android:label="@string/login_title" />
+        android:label="@string/login_title">
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_loginFragment_to_signupFragment"
+            app:destination="@id/signupFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/signupFragment"
+        android:name="com.example.gsb_visite.ui.login.SignupFragment"
+        android:label="Inscription" />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.gsb_visite.ui.HomeFragment"
+        android:label="Accueil" />
 </navigation>

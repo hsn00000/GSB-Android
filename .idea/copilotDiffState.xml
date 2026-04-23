@@ -29,15 +29,6 @@
             </PendingDiffInfo>
           </value>
         </entry>
-        <entry key="$PROJECT_DIR$/build.gradle">
-          <value>
-            <PendingDiffInfo>
-              <option name="filePath" value="$PROJECT_DIR$/build.gradle" />
-              <option name="originalContent" value="plugins {&#10;    alias(libs.plugins.android.application)&#10;    alias(libs.plugins.hilt.android)&#10;    alias(libs.plugins.androidx.navigation.safeargs)&#10;}&#10;&#10;" />
-              <option name="updatedContent" value="buildscript {&#10;    repositories {&#10;        google()&#10;        mavenCentral()&#10;        gradlePluginPortal()&#10;    }&#10;    dependencies {&#10;        classpath &quot;com.android.tools.build:gradle:8.13.0&quot;&#10;        classpath &quot;com.google.dagger:hilt-android-gradle-plugin:2.44&quot;&#10;        classpath &quot;androidx.navigation:navigation-safe-args-gradle-plugin:2.9.4&quot;&#10;    }&#10;}&#10;&#10;allprojects {&#10;    repositories {&#10;        google()&#10;        mavenCentral()&#10;    }&#10;}" />
-            </PendingDiffInfo>
-          </value>
-        </entry>
       </map>
     </option>
   </component>
