@@ -27,7 +27,7 @@ public class VisiteurDetailsViewModel extends ViewModel {
 
     public void load() {
         state.setValue(VisiteurDetailsState.loading());
-        visiteurRepository.getCurrentVisiteurDetails(new VisiteurRepository.RepositoryCallback<Visiteur>() {
+        visiteurRepository.getCurrentVisiteurWithPortefeuille(new VisiteurRepository.RepositoryCallback<Visiteur>() {
             @Override
             public void onSuccess(Visiteur result) {
                 state.setValue(VisiteurDetailsState.success(result));

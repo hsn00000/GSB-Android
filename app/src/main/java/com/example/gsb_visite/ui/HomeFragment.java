@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.gsb_visite.R;
-import com.example.gsb_visite.data.model.Visiteur;
+import com.example.gsb_visite.data.api.ApiService;
 import com.google.android.material.button.MaterialButton;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -36,7 +36,7 @@ public class HomeFragment extends Fragment {
         );
 
         logoutButton.setOnClickListener(v -> {
-            Visiteur.clearToken();
+            ApiService.clearToken();
             Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_loginFragment);
         });
     }

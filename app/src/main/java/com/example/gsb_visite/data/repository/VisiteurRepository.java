@@ -18,6 +18,17 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class VisiteurRepository {
+    private static final String[] VISITEUR_KEYS = {"visiteur", "user", "data"};
+    private static final String[] VISITEUR_ID_KEYS = {
+            "id", "_id", "idVisiteur", "visiteurId", "id_visiteur", "visiteur_id",
+            "userId", "user_id", "sub", "matricule"
+    };
+    private static final String[] PORTEFEUILLE_KEYS = {"portefeuille", "data", "items", "medecins", "contacts"};
+    private static final String[] PORTEFEUILLE_ITEM_KEYS = {"praticien", "medecin", "contact", "client"};
+    private static final String[] PRATICIEN_ID_KEYS = {
+            "id", "_id", "idPraticien", "praticienId", "id_praticien", "praticien_id"
+    };
+
     private final ApiService apiService;
     private final Gson gson = new Gson();
 
@@ -26,7 +37,7 @@ public class VisiteurRepository {
         this.apiService = apiService;
     }
 
-    public void getCurrentVisiteurDetails(RepositoryCallback<Visiteur> callback) {
+    public void getCurrentVisiteurWithPortefeuille(RepositoryCallback<Visiteur> callback) {
         apiService.getCurrentVisiteur().enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
@@ -35,7 +46,7 @@ public class VisiteurRepository {
                     return;
                 }
 
-                Visiteur visiteur = parseVisiteur(response.body());
+                Visiteur visiteur = getVisiteurFrom(response.body());
                 if (visiteur == null || isBlank(visiteur.getId())) {
                     callback.onError("L'API a répondu, mais aucun identifiant visiteur n'a été trouvé dans /me.");
                     return;
@@ -60,7 +71,7 @@ public class VisiteurRepository {
                     return;
                 }
 
-                visiteur.setPortefeuille(parsePortefeuille(response.body()));
+                visiteur.setPortefeuille(getPortefeuilleFrom(response.body()));
                 callback.onSuccess(visiteur);
             }
 
@@ -71,118 +82,121 @@ public class VisiteurRepository {
         });
     }
 
-    private Visiteur parseVisiteur(JsonElement element) {
-        JsonObject object = unwrapObject(element, "visiteur", "user", "data");
-        if (object == null) {
+    private Visiteur getVisiteurFrom(JsonElement json) {
+        JsonObject visiteurJson = findObject(json, VISITEUR_KEYS);
+        if (visiteurJson == null) {
             return null;
         }
 
-        Visiteur visiteur = gson.fromJson(object, Visiteur.class);
+        Visiteur visiteur = gson.fromJson(visiteurJson, Visiteur.class);
         if (visiteur != null && isBlank(visiteur.getId())) {
-            visiteur.setId(findStringValue(
-                    element,
-                    "id", "_id", "idVisiteur", "visiteurId", "id_visiteur", "visiteur_id",
-                    "userId", "user_id", "sub", "matricule"
-            ));
+            visiteur.setId(findString(json, VISITEUR_ID_KEYS));
         }
         return visiteur;
     }
 
-    private List<Portefeuille> parsePortefeuille(JsonElement element) {
-        List<Portefeuille> items = new ArrayList<>();
-        JsonArray array = unwrapArray(element, "portefeuille", "data", "items", "medecins", "contacts");
-        if (array == null) {
-            return items;
+    private List<Portefeuille> getPortefeuilleFrom(JsonElement json) {
+        List<Portefeuille> portefeuille = new ArrayList<>();
+        JsonArray portefeuilleJson = findArray(json, PORTEFEUILLE_KEYS);
+        if (portefeuilleJson == null) {
+            return portefeuille;
         }
 
-        for (JsonElement itemElement : array) {
-            JsonObject itemObject = unwrapObject(itemElement, "praticien", "medecin", "contact", "client");
-            if (itemObject != null) {
-                Portefeuille item = gson.fromJson(itemObject, Portefeuille.class);
-                if (item != null && isBlank(item.getId())) {
-                    item.setId(findStringValue(
-                            itemElement,
-                            "id", "_id", "idPraticien", "praticienId", "id_praticien", "praticien_id"
-                    ));
-                }
-                if (item != null) {
-                    items.add(item);
-                }
+        for (JsonElement itemJson : portefeuilleJson) {
+            Portefeuille item = getPortefeuilleItemFrom(itemJson);
+            if (item != null) {
+                portefeuille.add(item);
             }
         }
-        return items;
+        return portefeuille;
     }
 
-    private JsonObject unwrapObject(JsonElement element, String... keys) {
-        if (element == null || !element.isJsonObject()) {
+    private Portefeuille getPortefeuilleItemFrom(JsonElement json) {
+        JsonObject itemJson = findObject(json, PORTEFEUILLE_ITEM_KEYS);
+        if (itemJson == null) {
             return null;
         }
 
-        JsonObject object = element.getAsJsonObject();
-        boolean foundNestedObject;
-        do {
-            foundNestedObject = false;
-            for (String key : keys) {
-                JsonElement nested = object.get(key);
-                if (nested != null && nested.isJsonObject()) {
-                    object = nested.getAsJsonObject();
-                    foundNestedObject = true;
-                    break;
-                }
+        Portefeuille item = gson.fromJson(itemJson, Portefeuille.class);
+        if (item != null && isBlank(item.getId())) {
+            item.setId(findString(json, PRATICIEN_ID_KEYS));
+        }
+        return item;
+    }
+
+    private JsonObject findObject(JsonElement json, String... possibleKeys) {
+        if (json == null || !json.isJsonObject()) {
+            return null;
+        }
+
+        JsonObject object = json.getAsJsonObject();
+        for (String key : possibleKeys) {
+            JsonElement nested = object.get(key);
+            if (nested != null && nested.isJsonObject()) {
+                return findObject(nested, possibleKeys);
             }
-        } while (foundNestedObject);
+        }
         return object;
     }
 
-    private String findStringValue(JsonElement element, String... keys) {
-        if (element == null || element.isJsonNull()) {
+    private JsonArray findArray(JsonElement json, String... possibleKeys) {
+        if (json == null) {
+            return null;
+        }
+        if (json.isJsonArray()) {
+            return json.getAsJsonArray();
+        }
+        if (!json.isJsonObject()) {
             return null;
         }
 
-        if (element.isJsonObject()) {
-            JsonObject object = element.getAsJsonObject();
-            for (String key : keys) {
+        JsonObject object = json.getAsJsonObject();
+        for (String key : possibleKeys) {
+            JsonElement value = object.get(key);
+            if (value == null) {
+                continue;
+            }
+            if (value.isJsonArray()) {
+                return value.getAsJsonArray();
+            }
+            if (value.isJsonObject()) {
+                JsonArray nestedArray = findArray(value, possibleKeys);
+                if (nestedArray != null) {
+                    return nestedArray;
+                }
+            }
+        }
+        return null;
+    }
+
+    private String findString(JsonElement json, String... possibleKeys) {
+        if (json == null || json.isJsonNull()) {
+            return null;
+        }
+
+        if (json.isJsonObject()) {
+            JsonObject object = json.getAsJsonObject();
+            for (String key : possibleKeys) {
                 JsonElement value = object.get(key);
                 if (value != null && value.isJsonPrimitive()) {
                     return value.getAsString();
                 }
             }
+
             for (String key : object.keySet()) {
-                String value = findStringValue(object.get(key), keys);
+                String value = findString(object.get(key), possibleKeys);
                 if (!isBlank(value)) {
                     return value;
                 }
             }
         }
 
-        if (element.isJsonArray()) {
-            for (JsonElement item : element.getAsJsonArray()) {
-                String value = findStringValue(item, keys);
+        if (json.isJsonArray()) {
+            for (JsonElement item : json.getAsJsonArray()) {
+                String value = findString(item, possibleKeys);
                 if (!isBlank(value)) {
                     return value;
                 }
-            }
-        }
-
-        return null;
-    }
-
-    private JsonArray unwrapArray(JsonElement element, String... keys) {
-        if (element == null) {
-            return null;
-        }
-        if (element.isJsonArray()) {
-            return element.getAsJsonArray();
-        }
-        if (!element.isJsonObject()) {
-            return null;
-        }
-
-        JsonObject object = element.getAsJsonObject();
-        for (String key : keys) {
-            JsonElement nested = object.get(key);
-            if (nested != null && nested.isJsonArray()) {
-                return nested.getAsJsonArray();
             }
         }
         return null;

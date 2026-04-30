@@ -29,7 +29,7 @@ public class LoginRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     Visiteur visiteur = response.body();
                     if (visiteur.getToken() != null && !visiteur.getToken().trim().isEmpty()) {
-                        Visiteur.saveToken(visiteur.getToken());
+                        ApiService.saveToken(visiteur.getToken());
                     }
                     callback.onSuccess(visiteur);
                 } else {

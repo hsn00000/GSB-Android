@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Visiteur {
-    private static String currentToken;
-
     @SerializedName(
             value = "id",
             alternate = {"_id", "idVisiteur", "visiteurId", "id_visiteur", "visiteur_id", "userId", "user_id", "sub", "matricule"}
@@ -90,18 +88,6 @@ public class Visiteur {
 
     public void setPortefeuille(List<Portefeuille> portefeuille) {
         this.portefeuille = portefeuille == null ? new ArrayList<>() : portefeuille;
-    }
-
-    public static void saveToken(String token) {
-        currentToken = token;
-    }
-
-    public static String getCurrentToken() {
-        return currentToken;
-    }
-
-    public static void clearToken() {
-        currentToken = null;
     }
 
     private static String join(String first, String second) {

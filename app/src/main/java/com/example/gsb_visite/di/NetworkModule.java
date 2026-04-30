@@ -1,7 +1,6 @@
 package com.example.gsb_visite.di;
 
 import com.example.gsb_visite.data.api.ApiService;
-import com.example.gsb_visite.data.model.Visiteur;
 
 import javax.inject.Singleton;
 
@@ -29,7 +28,7 @@ public class NetworkModule {
         return new OkHttpClient.Builder()
                 .addInterceptor(chain -> {
                     Request.Builder requestBuilder = chain.request().newBuilder();
-                    String token = Visiteur.getCurrentToken();
+                    String token = ApiService.getToken();
                     if (token != null && !token.trim().isEmpty()) {
                         requestBuilder.header("Authorization", "Bearer " + token);
                     }
