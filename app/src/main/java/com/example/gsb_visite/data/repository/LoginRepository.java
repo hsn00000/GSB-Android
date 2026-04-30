@@ -1,16 +1,14 @@
 package com.example.gsb_visite.data.repository;
 
 import com.example.gsb_visite.data.api.ApiService;
-import com.example.gsb_visite.data.model.LoginRequest;
-import com.example.gsb_visite.data.model.LoginResponse;
+import com.example.gsb_visite.data.model.Visiteur;
+import com.google.gson.JsonObject;
 
 import javax.inject.Inject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import com.example.gsb_visite.data.model.LoginCredentials;
 
 public class LoginRepository {
     private final ApiService apiService;
@@ -20,13 +18,20 @@ public class LoginRepository {
         this.apiService = apiService;
     }
 
-    public void login(String email, String password, RepositoryCallback<LoginResponse> callback) {
-        LoginCredentials credentials = new LoginCredentials(email, password);
-        apiService.login(credentials).enqueue(new Callback<LoginResponse>() {
+    public void login(String email, String password, RepositoryCallback<Visiteur> callback) {
+        JsonObject credentials = new JsonObject();
+        credentials.addProperty("email", email);
+        credentials.addProperty("password", password);
+
+        apiService.login(credentials).enqueue(new Callback<Visiteur>() {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+            public void onResponse(Call<Visiteur> call, Response<Visiteur> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    callback.onSuccess(response.body());
+                    Visiteur visiteur = response.body();
+                    if (visiteur.getToken() != null && !visiteur.getToken().trim().isEmpty()) {
+                        Visiteur.saveToken(visiteur.getToken());
+                    }
+                    callback.onSuccess(visiteur);
                 } else {
                     String errorMsg = "Erreur " + response.code();
                     try {
@@ -41,7 +46,7 @@ public class LoginRepository {
             }
 
             @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
+            public void onFailure(Call<Visiteur> call, Throwable t) {
                 callback.onError("Erreur réseau : " + t.getMessage());
             }
         });

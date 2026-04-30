@@ -13,8 +13,8 @@ import androidx.navigation.Navigation;
 
 import com.example.gsb_visite.R;
 import com.example.gsb_visite.data.api.ApiService;
-import com.example.gsb_visite.data.model.LoginRequest;
-import com.example.gsb_visite.data.model.LoginResponse;
+import com.example.gsb_visite.data.model.Visiteur;
+import com.google.gson.JsonObject;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -66,10 +66,16 @@ public class SignupFragment extends Fragment {
                 return;
             }
 
-            LoginRequest request = new LoginRequest(email, password, nom, prenom, phone);
-            apiService.signup(request).enqueue(new Callback<LoginResponse>() {
+            JsonObject request = new JsonObject();
+            request.addProperty("email", email);
+            request.addProperty("password", password);
+            request.addProperty("nom", nom);
+            request.addProperty("prenom", prenom);
+            request.addProperty("telephone", phone);
+
+            apiService.signup(request).enqueue(new Callback<Visiteur>() {
                 @Override
-                public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                public void onResponse(Call<Visiteur> call, Response<Visiteur> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(requireContext(), "Compte créé ! Connectez-vous.", Toast.LENGTH_LONG).show();
                         Navigation.findNavController(view).navigateUp(); // Retour au login
@@ -79,7 +85,7 @@ public class SignupFragment extends Fragment {
                 }
 
                 @Override
-                public void onFailure(Call<LoginResponse> call, Throwable t) {
+                public void onFailure(Call<Visiteur> call, Throwable t) {
                     Toast.makeText(requireContext(), "Erreur réseau", Toast.LENGTH_SHORT).show();
                 }
             });

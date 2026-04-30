@@ -1,6 +1,7 @@
 package com.example.gsb_visite.di;
 
 import com.example.gsb_visite.data.api.ApiService;
+import com.example.gsb_visite.data.model.Visiteur;
 
 import javax.inject.Singleton;
 
@@ -9,6 +10,7 @@ import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -25,6 +27,14 @@ public class NetworkModule {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         return new OkHttpClient.Builder()
+                .addInterceptor(chain -> {
+                    Request.Builder requestBuilder = chain.request().newBuilder();
+                    String token = Visiteur.getCurrentToken();
+                    if (token != null && !token.trim().isEmpty()) {
+                        requestBuilder.header("Authorization", "Bearer " + token);
+                    }
+                    return chain.proceed(requestBuilder.build());
+                })
                 .addInterceptor(logging)
                 .build();
     }

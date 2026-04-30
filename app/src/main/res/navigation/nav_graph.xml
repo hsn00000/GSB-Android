@@ -26,5 +26,32 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.gsb_visite.ui.HomeFragment"
-        android:label="Accueil" />
+        android:label="Accueil">
+        <action
+            android:id="@+id/action_homeFragment_to_visiteurDetailsFragment"
+            app:destination="@id/visiteurDetailsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/visiteurDetailsFragment"
+        android:name="com.example.gsb_visite.ui.visitor.VisiteurDetailsFragment"
+        android:label="Mes informations">
+        <action
+            android:id="@+id/action_visiteurDetailsFragment_to_praticienDetailsFragment"
+            app:destination="@id/praticienDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/praticienDetailsFragment"
+        android:name="com.example.gsb_visite.ui.praticien.PraticienDetailsFragment"
+        android:label="Informations praticien">
+        <argument
+            android:name="praticienId"
+            app:argType="string" />
+    </fragment>
 </navigation>

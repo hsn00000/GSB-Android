@@ -11,8 +11,12 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.gsb_visite.R;
+import com.example.gsb_visite.data.model.Visiteur;
 import com.google.android.material.button.MaterialButton;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class HomeFragment extends Fragment {
     @Nullable
     @Override
@@ -25,9 +29,15 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         MaterialButton logoutButton = view.findViewById(R.id.home_logout_button);
+        MaterialButton visitorInfoButton = view.findViewById(R.id.home_visitor_info_button);
+
+        visitorInfoButton.setOnClickListener(v ->
+                Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_visiteurDetailsFragment)
+        );
+
         logoutButton.setOnClickListener(v -> {
-            // Retourne à l'écran de login
-            Navigation.findNavController(view).navigateUp();
+            Visiteur.clearToken();
+            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_loginFragment);
         });
     }
 }

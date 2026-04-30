@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.gsb_visite.R;
-import com.example.gsb_visite.data.model.LoginResponse;
+import com.example.gsb_visite.data.model.Visiteur;
 import com.example.gsb_visite.data.repository.LoginRepository;
 
 import javax.inject.Inject;
@@ -41,10 +41,10 @@ public class LoginViewModel extends ViewModel {
             return;
         }
 
-        loginRepository.login(email, password, new LoginRepository.RepositoryCallback<LoginResponse>() {
+        loginRepository.login(email, password, new LoginRepository.RepositoryCallback<Visiteur>() {
             @Override
-            public void onSuccess(LoginResponse result) {
-                loginResult.setValue(new LoginResult(result.getUsername(), false));
+            public void onSuccess(Visiteur result) {
+                loginResult.setValue(new LoginResult(result.getDisplayName(), false));
             }
 
             @Override

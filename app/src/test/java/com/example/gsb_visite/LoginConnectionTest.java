@@ -3,8 +3,8 @@ package com.example.gsb_visite;
 import static org.junit.Assert.assertNotNull;
 
 import com.example.gsb_visite.data.api.ApiService;
-import com.example.gsb_visite.data.model.LoginRequest;
-import com.example.gsb_visite.data.model.LoginResponse;
+import com.example.gsb_visite.data.model.Visiteur;
+import com.google.gson.JsonObject;
 
 import org.junit.Test;
 
@@ -27,8 +27,10 @@ public class LoginConnectionTest {
 
         ApiService service = retrofit.create(ApiService.class);
         
-        LoginRequest request = new LoginRequest("test@example.com", "password123");
-        Call<LoginResponse> call = service.login(request);
+        JsonObject request = new JsonObject();
+        request.addProperty("email", "test@example.com");
+        request.addProperty("password", "password123");
+        Call<Visiteur> call = service.login(request);
 
         assertNotNull("La requête ne doit pas être nulle", call);
         System.out.println("Configuration Retrofit validée : Prêt pour l'envoi vers /login");
