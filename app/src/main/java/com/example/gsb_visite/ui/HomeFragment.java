@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,6 +28,7 @@ public class HomeFragment extends Fragment {
     VisiteurRepository visiteurRepository;
 
     private MaterialButton transferPortfolioButton;
+    private TextView roleText;
 
     @Nullable
     @Override
@@ -41,7 +43,9 @@ public class HomeFragment extends Fragment {
         MaterialButton logoutButton = view.findViewById(R.id.home_logout_button);
         MaterialButton visitorInfoButton = view.findViewById(R.id.home_visitor_info_button);
         transferPortfolioButton = view.findViewById(R.id.home_transfer_portfolio_button);
+        roleText = view.findViewById(R.id.home_role_text);
 
+        roleText.setVisibility(View.GONE);
         transferPortfolioButton.setVisibility(View.GONE);
         transferPortfolioButton.setOnClickListener(v ->
                 Toast.makeText(requireContext(), "Transfert de portefeuille à venir", Toast.LENGTH_SHORT).show()
@@ -63,19 +67,22 @@ public class HomeFragment extends Fragment {
         visiteurRepository.getCurrentVisiteur(new VisiteurRepository.RepositoryCallback<Visiteur>() {
             @Override
             public void onSuccess(Visiteur result) {
-                if (!isAdded() || transferPortfolioButton == null) {
+                if (!isAdded() || roleText == null || transferPortfolioButton == null) {
                     return;
                 }
 
-                transferPortfolioButton.setVisibility(result.isResponsable() ? View.VISIBLE : View.GONE);
+                int visibility = result.isResponsable() ? View.VISIBLE : View.GONE;
+                roleText.setVisibility(visibility);
+                transferPortfolioButton.setVisibility(visibility);
             }
 
             @Override
             public void onError(String message) {
-                if (!isAdded() || transferPortfolioButton == null) {
+                if (!isAdded() || roleText == null || transferPortfolioButton == null) {
                     return;
                 }
 
+                roleText.setVisibility(View.GONE);
                 transferPortfolioButton.setVisibility(View.GONE);
             }
         });
