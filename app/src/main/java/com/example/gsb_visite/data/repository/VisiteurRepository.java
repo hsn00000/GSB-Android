@@ -37,6 +37,31 @@ public class VisiteurRepository {
         this.apiService = apiService;
     }
 
+    public void getCurrentVisiteur(RepositoryCallback<Visiteur> callback) {
+        apiService.getCurrentVisiteur().enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    callback.onError(buildErrorMessage(response));
+                    return;
+                }
+
+                Visiteur visiteur = getVisiteurFrom(response.body());
+                if (visiteur == null || isBlank(visiteur.getId())) {
+                    callback.onError("L'API a répondu, mais aucun identifiant visiteur n'a été trouvé dans /me.");
+                    return;
+                }
+
+                callback.onSuccess(visiteur);
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                callback.onError("Erreur réseau : " + t.getMessage());
+            }
+        });
+    }
+
     public void getCurrentVisiteurWithPortefeuille(RepositoryCallback<Visiteur> callback) {
         apiService.getCurrentVisiteur().enqueue(new Callback<JsonElement>() {
             @Override

@@ -31,6 +31,8 @@ public class Visiteur {
     private String ville;
     @SerializedName("cp")
     private String codePostal;
+    @SerializedName("role")
+    private String role;
     private List<Portefeuille> portefeuille = new ArrayList<>();
 
     public String getId() {
@@ -75,6 +77,14 @@ public class Visiteur {
 
     public String getCodePostal() {
         return codePostal;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public boolean isResponsable() {
+        return "responsable".equalsIgnoreCase(role);
     }
 
     public String getDisplayName() {
