@@ -39,6 +39,12 @@ public interface ApiService {
     @GET("api/visiteurs/{id}/portefeuille")
     Call<JsonElement> getPortefeuille(@Path("id") String visiteurId);
 
+    @POST("api/visiteurs/{id}/portefeuille/transfert")
+    Call<JsonElement> transferPortefeuille(
+            @Path("id") String visiteurSourceId,
+            @Body JsonObject request
+    );
+
     @GET("api/praticiens/{id}")
     Call<JsonElement> getPraticien(@Path("id") String praticienId);
 }

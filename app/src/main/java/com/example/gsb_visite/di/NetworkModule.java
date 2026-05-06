@@ -18,7 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @InstallIn(SingletonComponent.class)
 public class NetworkModule {
 
-    private static final String BASE_URL = "https://reimagined-funicular-7v59xqwq6x6j3rq7w-3000.app.github.dev/"; // Correspond à localhost:3000 pour l'émulateur
+    private static final String BASE_URL = "https://reimagined-funicular-7v59xqwq6x6j3rq7w-3000.app.github.dev/"; // Correspond à localhost:8080 pour l'émulateur Android
 
     @Provides
     @Singleton

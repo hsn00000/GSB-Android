@@ -87,6 +87,32 @@ public class VisiteurRepository {
         });
     }
 
+    public void transferPortefeuille(
+            String visiteurSourceId,
+            String visiteurDestinataireId,
+            RepositoryCallback<String> callback
+    ) {
+        JsonObject request = new JsonObject();
+        request.addProperty("visiteurDestinataireId", visiteurDestinataireId);
+
+        apiService.transferPortefeuille(visiteurSourceId, request).enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (!response.isSuccessful()) {
+                    callback.onError(buildErrorMessage(response));
+                    return;
+                }
+
+                callback.onSuccess(getMessageFrom(response.body(), "Portefeuille transféré avec succès"));
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                callback.onError("Erreur réseau : " + t.getMessage());
+            }
+        });
+    }
+
     private void loadPortefeuille(Visiteur visiteur, RepositoryCallback<Visiteur> callback) {
         apiService.getPortefeuille(visiteur.getId()).enqueue(new Callback<JsonElement>() {
             @Override
@@ -231,12 +257,25 @@ public class VisiteurRepository {
         String errorMsg = "Erreur " + response.code();
         try {
             if (response.errorBody() != null) {
-                errorMsg += " : " + response.errorBody().string();
+                String errorBody = response.errorBody().string();
+                JsonElement errorJson = gson.fromJson(errorBody, JsonElement.class);
+                String apiMessage = getMessageFrom(errorJson, null);
+                return isBlank(apiMessage) ? errorMsg + " : " + errorBody : apiMessage;
             }
         } catch (Exception e) {
             // Le code HTTP suffit si le corps d'erreur n'est pas lisible.
         }
         return errorMsg;
+    }
+
+    private String getMessageFrom(JsonElement json, String fallback) {
+        if (json != null && json.isJsonObject()) {
+            JsonElement message = json.getAsJsonObject().get("message");
+            if (message != null && message.isJsonPrimitive()) {
+                return message.getAsString();
+            }
+        }
+        return fallback;
     }
 
     private boolean isBlank(String value) {
